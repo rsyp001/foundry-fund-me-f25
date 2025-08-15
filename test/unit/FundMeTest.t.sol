@@ -20,11 +20,11 @@ contract FundMeTest is Test {
         //fundMe = new FundMe(0x694AA1769357215DE4FAC081bf1f309aDC325306);
     }
 
-    function testMINIMUMUSDISFIVE() public {
+    function testMINIMUMUSDISFIVE() public view {
         assertEq(fundMe.MINIMUM_USD(), 5e18);
     }
 
-    function testownerisMsgSenders() public {
+    function testownerisMsgSenders() public view {
         console.log(msg.sender);
         console.log(fundMe.i_owner());
         assertEq(fundMe.i_owner(), msg.sender);
@@ -104,7 +104,7 @@ contract FundMeTest is Test {
     function testWithDrawFromMultipleAccounts() public funded {
         uint160 numberOfFunders = 10;
         uint160 startingFunderIndex = 1;
-        for (uint160 i = 1; i < numberOfFunders; i++) {
+        for (uint160 i = startingFunderIndex; i < numberOfFunders; i++) {
             hoax(address(i), SEND_VALUE);
             fundMe.fund{value: SEND_VALUE}(); //hoax is a helper function that creates a transaction from a specific address with a specific value
         }
