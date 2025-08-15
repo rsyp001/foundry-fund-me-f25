@@ -6,8 +6,9 @@ import {MockV3Aggregator} from "../test/Mocks/MockV3Aggregator.sol";
 
 contract HelperConfig is Script {
     uint8 public constant DECIMALS = 8;
-    int public constant INITIAL_ANSWER = 2000e8; // 2000 with 8 decimals
+    int256 public constant INITIAL_ANSWER = 2000e8; // 2000 with 8 decimals
     NetworkConfig public activeNetworkConfig;
+
     struct NetworkConfig {
         address PriceFeed;
     }
@@ -21,9 +22,7 @@ contract HelperConfig is Script {
     }
 
     function getSepoliaEThConfig() public pure returns (NetworkConfig memory) {
-        NetworkConfig memory SepoliaConfig = NetworkConfig({
-            PriceFeed: 0x694AA1769357215DE4FAC081bf1f309aDC325306
-        });
+        NetworkConfig memory SepoliaConfig = NetworkConfig({PriceFeed: 0x694AA1769357215DE4FAC081bf1f309aDC325306});
         return SepoliaConfig;
     }
 
@@ -33,15 +32,10 @@ contract HelperConfig is Script {
         //mock contract-special type of contract that stimulates the behaviour of another contract in testing
 
         vm.startBroadcast();
-        MockV3Aggregator mockPriceFeed = new MockV3Aggregator(
-            DECIMALS,
-            INITIAL_ANSWER
-        );
+        MockV3Aggregator mockPriceFeed = new MockV3Aggregator(DECIMALS, INITIAL_ANSWER);
         vm.stopBroadcast();
 
-        NetworkConfig memory anvilConfig = NetworkConfig({
-            PriceFeed: address(mockPriceFeed)
-        });
+        NetworkConfig memory anvilConfig = NetworkConfig({PriceFeed: address(mockPriceFeed)});
         return anvilConfig;
     }
 }

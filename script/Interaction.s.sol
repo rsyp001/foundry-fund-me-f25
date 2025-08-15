@@ -6,7 +6,7 @@ import {DevOpsTools} from "../lib/foundry-devops/src/DevOpsTools.sol";
 import {FundMe} from "../src/Fundme.sol";
 
 contract FundFundMe is Script {
-    uint constant SEND_MONEY = 0.01 ether;
+    uint256 constant SEND_MONEY = 0.01 ether;
 
     function fundFundMe(address mostRecentDeployed) public {
         FundMe(payable(mostRecentDeployed)).fund{value: SEND_MONEY}();
@@ -14,10 +14,7 @@ contract FundFundMe is Script {
     }
 
     function run() external {
-        address mostRecentDeployed = DevOpsTools.get_most_recent_deployment(
-            "FundMe",
-            block.chainid
-        );
+        address mostRecentDeployed = DevOpsTools.get_most_recent_deployment("FundMe", block.chainid);
         vm.startBroadcast();
 
         fundFundMe(mostRecentDeployed);
@@ -34,10 +31,7 @@ contract WithDrawFundMe is Script {
     }
 
     function run() external {
-        address mostRecentDeployed = DevOpsTools.get_most_recent_deployment(
-            "FundMe",
-            block.chainid
-        );
+        address mostRecentDeployed = DevOpsTools.get_most_recent_deployment("FundMe", block.chainid);
 
         WithdrawFundMe(mostRecentDeployed);
     }

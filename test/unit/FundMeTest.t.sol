@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
+
 import {Test, console} from "forge-std/Test.sol";
 import {FundMe} from "../../src/Fundme.sol";
 import {DeployFundMe} from "../../script/DeployFundMe.s.sol";
@@ -8,9 +9,9 @@ contract FundMeTest is Test {
     FundMe fundMe;
 
     address USER = makeAddr("user");
-    uint constant SEND_VALUE = 0.1 ether;
-    uint constant STARTING_BALANCE = 10 ether;
-    uint constant GAS_PRICE = 1;
+    uint256 constant SEND_VALUE = 0.1 ether;
+    uint256 constant STARTING_BALANCE = 10 ether;
+    uint256 constant GAS_PRICE = 1;
 
     function setUp() external {
         DeployFundMe deployFundMe = new DeployFundMe();
@@ -31,16 +32,16 @@ contract FundMeTest is Test {
     }
 
     function testGetVersionIsAccurate() public {
-        uint version = fundMe.getVersion();
+        uint256 version = fundMe.getVersion();
         assertEq(version, 4);
     }
 
     function testPriceFeedVersionIsAccurate() public {
         if (block.chainid == 11155111) {
-            uint version = fundMe.getVersion();
+            uint256 version = fundMe.getVersion();
             assertEq(version, 4);
         } else if (block.chainid == 1) {
-            uint version = fundMe.getVersion();
+            uint256 version = fundMe.getVersion();
             assertEq(version, 6);
         }
     }
@@ -54,7 +55,7 @@ contract FundMeTest is Test {
         vm.prank(USER); //the next tx will be sent by USER
         fundMe.fund{value: SEND_VALUE}();
 
-        uint AmountFunded = fundMe.getAddressToAmountFunded(USER);
+        uint256 AmountFunded = fundMe.getAddressToAmountFunded(USER);
         assertEq(AmountFunded, SEND_VALUE);
     }
 
@@ -79,8 +80,8 @@ contract FundMeTest is Test {
 
     function testWithdrawWithSingleFunder() public funded {
         //1-arrange
-        uint startingOwnerBalance = fundMe.getOwner().balance;
-        uint startingFundMeBalance = address(fundMe).balance;
+        uint256 startingOwnerBalance = fundMe.getOwner().balance;
+        uint256 startingFundMeBalance = address(fundMe).balance;
         //2-act
         // vm.txGasPrice(GAS_PRICE);
         // uint gasStart = gasleft();
@@ -92,13 +93,10 @@ contract FundMeTest is Test {
         // uint gasUsed = (gasStart - gasEnd);
 
         //3-assert
-        uint endingFundMeBalance = address(fundMe).balance;
-        uint endingOwnerBalance = fundMe.getOwner().balance;
+        uint256 endingFundMeBalance = address(fundMe).balance;
+        uint256 endingOwnerBalance = fundMe.getOwner().balance;
         assertEq(endingFundMeBalance, 0);
-        assertEq(
-            endingOwnerBalance,
-            startingOwnerBalance + startingFundMeBalance
-        );
+        assertEq(endingOwnerBalance, startingOwnerBalance + startingFundMeBalance);
     }
 
     function testWithDrawFromMultipleAccounts() public funded {
@@ -109,8 +107,8 @@ contract FundMeTest is Test {
             fundMe.fund{value: SEND_VALUE}(); //hoax is a helper function that creates a transaction from a specific address with a specific value
         }
 
-        uint startingOwnerBalance = fundMe.getOwner().balance;
-        uint startingFundMeBalance = address(fundMe).balance;
+        uint256 startingOwnerBalance = fundMe.getOwner().balance;
+        uint256 startingFundMeBalance = address(fundMe).balance;
 
         vm.startPrank(fundMe.getOwner());
         fundMe.withdraw();
@@ -120,10 +118,7 @@ contract FundMeTest is Test {
         // uint endingOwnerBalance = fundMe.getOwner().balance;
 
         assertEq(address(fundMe).balance, 0);
-        assertEq(
-            fundMe.getOwner().balance,
-            startingOwnerBalance + startingFundMeBalance
-        );
+        assertEq(fundMe.getOwner().balance, startingOwnerBalance + startingFundMeBalance);
         // assert(
         //     (numberOfFunders + 1) * SEND_VALUE ==
         //         fundMe.getOwner().balance - startingOwnerBalance
@@ -138,8 +133,8 @@ contract FundMeTest is Test {
             fundMe.fund{value: SEND_VALUE}(); //hoax is a helper function that creates a transaction from a specific address with a specific value
         }
 
-        uint startingOwnerBalance = fundMe.getOwner().balance;
-        uint startingFundMeBalance = address(fundMe).balance;
+        uint256 startingOwnerBalance = fundMe.getOwner().balance;
+        uint256 startingFundMeBalance = address(fundMe).balance;
 
         vm.startPrank(fundMe.getOwner());
         fundMe.cheaperWithdraw();
@@ -149,9 +144,6 @@ contract FundMeTest is Test {
         // uint endingOwnerBalance = fundMe.getOwner().balance;
 
         assertEq(address(fundMe).balance, 0);
-        assertEq(
-            fundMe.getOwner().balance,
-            startingOwnerBalance + startingFundMeBalance
-        );
+        assertEq(fundMe.getOwner().balance, startingOwnerBalance + startingFundMeBalance);
     }
 }
