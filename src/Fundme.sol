@@ -1,6 +1,6 @@
-//SPDX-License-Identifier: MIT
-pragma solidity ^0.8.18;
+// SPDX-License-Identifier: MIT
 
+pragma solidity ^0.8.18;
 // Note: The AggregatorV3Interface might be at a different location than what was in the video!
 import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
 import {PriceConverter} from "./PriceConverter.sol";
@@ -17,15 +17,9 @@ contract FundMe {
     uint256 public constant MINIMUM_USD = 5 * 10 ** 18;
     AggregatorV3Interface private s_priceFeed;
 
-    modifier onlyOwner() {
-        // require(msg.sender == owner);
-        if (msg.sender != i_owner) revert NotOwner();
-        _;
-    }
-
     constructor(address priceFeed) {
-        s_priceFeed = AggregatorV3Interface(priceFeed);
         i_owner = msg.sender;
+        s_priceFeed = AggregatorV3Interface(priceFeed);
     }
 
     function fund() public payable {
@@ -42,6 +36,12 @@ contract FundMe {
         return s_priceFeed.version();
     }
 
+    modifier onlyOwner() {
+        // require(msg.sender == owner);
+        if (msg.sender != i_owner) revert NotOwner();
+        _;
+    }
+
     function cheaperWithdraw() public onlyOwner {
         uint256 fundersLength = s_funders.length;
         for (
@@ -53,8 +53,10 @@ contract FundMe {
             s_addressToAmountFunded[funder] = 0;
         }
         s_funders = new address[](0);
-        (bool Success, ) = i_owner.call{value: address(this).balance}("");
-        require(Success, "Call failed");
+        (bool callSuccess, ) = payable(msg.sender).call{
+            value: address(this).balance
+        }("");
+        require(callSuccess, "Call failed");
     }
 
     function withdraw() public onlyOwner {
@@ -69,8 +71,10 @@ contract FundMe {
         s_funders = new address[](0);
 
         // call
-        (bool Success, ) = i_owner.call{value: address(this).balance}("");
-        require(Success, "Call failed");
+        (bool callSuccess, ) = payable(msg.sender).call{
+            value: address(this).balance
+        }("");
+        require(callSuccess, "Call failed");
     }
 
     // Ether is sent to contract
@@ -94,19 +98,15 @@ contract FundMe {
 
     function getAddressToAmountFunded(
         address fundingAddress
-    ) public view returns (uint256) {
+    ) external view returns (uint256) {
         return s_addressToAmountFunded[fundingAddress];
     }
 
-    function getFunder(uint256 index) public view returns (address) {
+    function getFunder(uint256 index) external view returns (address) {
         return s_funders[index];
     }
 
-    function getOwner() public view returns (address) {
+    function getOwner() external view returns (address) {
         return i_owner;
-    }
-
-    function getPriceFeed() public view returns (AggregatorV3Interface) {
-        return s_priceFeed;
     }
 }
