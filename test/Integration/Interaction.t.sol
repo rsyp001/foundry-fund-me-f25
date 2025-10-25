@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {Test, console} from "forge-std/Test.sol";
-import {FundMe} from "../../src/Fundme.sol";
+import {FundMe} from "../../src/FundMe.sol";
 import {DeployFundMe} from "../../script/DeployFundMe.s.sol";
 import {FundFundMe, WithDrawFundMe} from "../../script/Interaction.s.sol";
 
@@ -23,6 +23,7 @@ contract InteractionsTest is Test {
     function testUserCanFundInteraction() public {
         vm.prank(USER);
         fundMe.fund{value: SEND_VALUE}();
+
         WithDrawFundMe withdrawFundMe = new WithDrawFundMe();
         withdrawFundMe.WithdrawFundMe(address(fundMe));
 

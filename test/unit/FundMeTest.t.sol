@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {Test, console} from "forge-std/Test.sol";
-import {FundMe} from "../../src/Fundme.sol";
+import {FundMe} from "../../src/FundMe.sol";
 import {DeployFundMe} from "../../script/DeployFundMe.s.sol";
 
 contract FundMeTest is Test {
@@ -45,12 +45,12 @@ contract FundMeTest is Test {
     }
 
     function testFundFailwithoutEnoughETH() public {
-        vm.expectRevert(); //the next line should revert
+        vm.expectRevert();
         fundMe.fund();
     }
 
     function testFundUpdateFundedDataStructure() public {
-        vm.prank(USER); //the next tx will be sent by USER
+        vm.prank(USER);
         fundMe.fund{value: SEND_VALUE}();
 
         uint256 AmountFunded = fundMe.getAddressToAmountFunded(USER);
@@ -80,15 +80,17 @@ contract FundMeTest is Test {
         //1-arrange
         uint256 startingOwnerBalance = fundMe.getOwner().balance;
         uint256 startingFundMeBalance = address(fundMe).balance;
+
         //2-act
-        // vm.txGasPrice(GAS_PRICE);
-        // uint gasStart = gasleft();
+        vm.txGasPrice(GAS_PRICE);
+        uint256 gasStart = gasleft();
 
         vm.startPrank(fundMe.getOwner());
         fundMe.withdraw();
         vm.stopPrank();
-        // uint gasEnd = gasleft();
-        // uint gasUsed = (gasStart - gasEnd);
+
+        uint256 gasEnd = gasleft();
+        uint256 gasUsed = (gasStart - gasEnd);
 
         //3-assert
         uint256 endingFundMeBalance = address(fundMe).balance;
@@ -102,7 +104,7 @@ contract FundMeTest is Test {
         uint160 startingFunderIndex = 1;
         for (uint160 i = startingFunderIndex; i < numberOfFunders; i++) {
             hoax(address(i), SEND_VALUE);
-            fundMe.fund{value: SEND_VALUE}(); //hoax is a helper function that creates a transaction from a specific address with a specific value
+            fundMe.fund{value: SEND_VALUE}();
         }
 
         uint256 startingOwnerBalance = fundMe.getOwner().balance;
@@ -113,11 +115,7 @@ contract FundMeTest is Test {
         vm.stopPrank();
 
         assertEq(address(fundMe).balance, 0);
-        assertEq(fundMe.getOwner().balance, startingOwnerBalance + startingFundMeBalance);
-        // assert(
-        //     (numberOfFunders + 1) * SEND_VALUE ==
-        //         fundMe.getOwner().balance - startingOwnerBalance
-        // );
+        assert(fundMe.getOwner().balance == startingOwnerBalance + startingFundMeBalance);
     }
 
     function testWithDrawFromMultipleAccountCheaper() public funded {

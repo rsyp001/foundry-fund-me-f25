@@ -6,7 +6,7 @@ import {MockV3Aggregator} from "../test/Mocks/MockV3Aggregator.sol";
 
 contract HelperConfig is Script {
     uint8 public constant DECIMALS = 8;
-    int256 public constant INITIAL_ANSWER = 2000e8; // 2000 with 8 decimals
+    int256 public constant INITIAL_ANSWER = 2000e8;
     NetworkConfig public activeNetworkConfig;
 
     struct NetworkConfig {
