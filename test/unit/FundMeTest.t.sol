@@ -17,8 +17,6 @@ contract FundMeTest is Test {
         DeployFundMe deployFundMe = new DeployFundMe();
         fundMe = deployFundMe.run();
         vm.deal(USER, STARTING_BALANCE);
-
-        //fundMe = new FundMe(0x694AA1769357215DE4FAC081bf1f309aDC325306);
     }
 
     function testMINIMUMUSDISFIVE() public view {
@@ -60,21 +58,21 @@ contract FundMeTest is Test {
     }
 
     function testAddsFundertoArrayOfFunders() public {
-        vm.prank(USER); //the next tx will be sent by USER
+        vm.prank(USER);
         fundMe.fund{value: SEND_VALUE}();
         address funder = fundMe.getFunder(0);
         assertEq(funder, USER);
     }
 
     modifier funded() {
-        vm.prank(USER); //the next tx will be sent by USER
+        vm.prank(USER);
         fundMe.fund{value: SEND_VALUE}();
         _;
     }
 
     function testOnlyOwnerCanWithdraw() public funded {
-        vm.prank(USER); //the next tx will be sent by USER
-        vm.expectRevert(); //the next line should revert
+        vm.prank(USER);
+        vm.expectRevert();
         fundMe.withdraw();
     }
 
@@ -127,7 +125,7 @@ contract FundMeTest is Test {
         uint160 startingFunderIndex = 1;
         for (uint160 i = 1; i < numberOfFunders; i++) {
             hoax(address(i), SEND_VALUE);
-            fundMe.fund{value: SEND_VALUE}(); //hoax is a helper function that creates a transaction from a specific address with a specific value
+            fundMe.fund{value: SEND_VALUE}();
         }
 
         uint256 startingOwnerBalance = fundMe.getOwner().balance;

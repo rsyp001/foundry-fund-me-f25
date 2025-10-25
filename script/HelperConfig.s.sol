@@ -28,8 +28,6 @@ contract HelperConfig is Script {
 
     function getOrCreateAnvilEThConfig() public returns (NetworkConfig memory) {
         if (activeNetworkConfig.PriceFeed != address(0)) {}
-        // if we are on a local anvil we deploy a mock contract
-        //mock contract-special type of contract that stimulates the behaviour of another contract in testing
 
         vm.startBroadcast();
         MockV3Aggregator mockPriceFeed = new MockV3Aggregator(DECIMALS, INITIAL_ANSWER);
